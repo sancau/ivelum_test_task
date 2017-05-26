@@ -104,5 +104,12 @@ class Transformer:
         self._transform_hyperlinks()
         for tag in ['body', 'title']:  # only parse what we need
             self._transform_tag(tag)
+
         # fix & symbols issue after bs4 processing
-        return str(self.soup).replace('amp;', '')
+        output = str(self.soup).replace('amp;', '')
+
+        # fix paths to favicons
+        output = output.replace('/images/favicons',
+                                'http://{}/images/favicons'.format(self.target_domain))
+
+        return output

@@ -26,9 +26,10 @@ def test_transform_adds_tm_symbols(transformer, test_input):
 
 def test_transform_changes_urls(transformer, test_input):
     actual = transformer.transform(test_input)
-    expected_count = test_input.count('http://proxy/replacethis')
-    expected_url = 'http://{}/replace_this'.format(transformer.target_domain)
+    expected_count = test_input.count('http://target/replace_this')
+    expected_url = 'http://{}/replace_this'.format(transformer.proxy_domain)
     assert actual.count(expected_url) == expected_count
+    assert actual.count('proxy') == expected_count
 
 
 def test_transform_changes_favicon_paths(transformer, test_input):

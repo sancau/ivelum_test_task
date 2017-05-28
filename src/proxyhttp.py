@@ -67,7 +67,7 @@ class Proxy:
             resp.status = falcon.HTTP_200
 
 
-def main(host='0.0.0.0', port=5000, target='http://habrahabr.ru'):
+def main(host='localhost', port=8080, target='http://habrahabr.ru'):
     api = falcon.API(middleware=[Proxy(target), ])
     print('Target domain: {}'.format(target))
     waitress.serve(api, host=host, port=port)

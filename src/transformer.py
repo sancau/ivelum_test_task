@@ -29,7 +29,7 @@ class Transformer:
         out = ''
         counter = 0
         for c in word:
-            if c.isalpha() or c.isnumeric() or c in ['-', '_']:
+            if c.isalpha() or c in ['-', '_']:
                 counter += 1
             else:
                 if counter == 6:

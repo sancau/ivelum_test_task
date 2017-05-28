@@ -10,14 +10,12 @@ def test_transform_adds_tm_symbols(transformer, test_input, request_source):
     actual = transformer.transform(test_input, request_source)
     expected_count = (
         test_input.count('change') +
-        test_input.count('chang5') +
         test_input.count('cha-ge') +
         test_input.count('cha_ge')
     )
     assert actual.count('\u2122') == expected_count
     assert (
         actual.count('change') +
-        actual.count('chang5') +
         actual.count('cha-ge') +
         actual.count('cha_ge')
     ) == expected_count

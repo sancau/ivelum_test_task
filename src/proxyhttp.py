@@ -2,6 +2,8 @@
 
 import traceback
 
+from urllib.parse import urlparse
+
 import falcon
 import fire
 import requests
@@ -14,22 +16,15 @@ class Proxy:
     """
     A falcon middleware acting as a proxy server
     """
-    def __init__(self, host, port, target):
+    def __init__(self, target):
         """
-        :param host: host address of the proxy app
-        :param port: port of the proxy app
         :param target: target domain to serve
 
         Also configures a Transformer instance that will be used to transform
         the html response of the target domain
         """
-        if port:
-            self.proxy_domain = '{}:{}'.format(host, port)
-        else:
-            self.proxy_domain = host
         self.target_domain = target.split('/')[-1]  # remove possible 'http://'
-        self.transformer = Transformer(proxy_domain=self.proxy_domain,
-                                       target_domain=self.target_domain)
+        self.transformer = Transformer(target_domain=self.target_domain)
 
     def process_request(self, req, resp):
         """
@@ -41,11 +36,12 @@ class Proxy:
         """
         try:
             # redirects request to the target domain
-            url = req.url.replace(self.proxy_domain, self.target_domain)
+            request_source = urlparse(req.url).netloc
+            url = req.url.replace(request_source, self.target_domain)
             _ = requests.get(url)
             _.raise_for_status()
             page = _.text
-            resp.body = self.transformer.transform(page)
+            resp.body = self.transformer.transform(page, request_source)
         except Exception as e:
             resp.status = falcon.HTTP_500
             error_info = {  # object to render in case of exception
@@ -71,8 +67,8 @@ class Proxy:
             resp.status = falcon.HTTP_200
 
 
-def main(host='localhost', port=5000, target='http://habrahabr.ru'):
-    api = falcon.API(middleware=[Proxy(host, port, target), ])
+def main(host='0.0.0.0', port=5000, target='http://habrahabr.ru'):
+    api = falcon.API(middleware=[Proxy(target), ])
     print('Target domain: {}'.format(target))
     waitress.serve(api, host=host, port=port)
 

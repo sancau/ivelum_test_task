@@ -12,13 +12,10 @@ def test_api_runs(client):
 
 
 def test_proxy_middleware_instance_initializes_correctly():
-    for port in ['', 5000, None]:
-        p = Proxy(host='proxy', port=port, target='target')
-        assert p.proxy_domain == 'proxy:{}'.format(port) if port else 'proxy'
-        assert p.target_domain == 'target'
-        assert isinstance(p.transformer, Transformer)
-        assert p.transformer.proxy_domain == p.proxy_domain
-        assert p.transformer.target_domain == p.target_domain
+    p = Proxy(target='target')
+    assert p.target_domain == 'target'
+    assert isinstance(p.transformer, Transformer)
+    assert p.transformer.target_domain == p.target_domain
 
 
 def test_app_returns_expected_data_with_not_existing_url(client):

@@ -11,7 +11,7 @@ from transformer import Transformer
 
 @pytest.fixture
 def transformer():
-    return Transformer('proxy', 'target')
+    return Transformer('target')
 
 
 @pytest.fixture
@@ -22,9 +22,11 @@ def test_input():
 
 @pytest.fixture
 def client():
-    print(falcon.testing.helpers.DEFAULT_HOST)
-    proxy = Proxy(host=falcon.testing.helpers.DEFAULT_HOST,
-                  port='',
-                  target='habrahabr.ru')
+    proxy = Proxy(target='habrahabr.ru')
     api = falcon.API(middleware=[proxy, ])
     return testing.TestClient(api)
+
+
+@pytest.fixture
+def request_source():
+    return falcon.testing.helpers.DEFAULT_HOST

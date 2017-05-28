@@ -9,8 +9,7 @@ class Transformer:
     symbol '\u2122' follows every word with length of 6 chars
     """
 
-    def __init__(self, proxy_domain, target_domain):
-        self.proxy_domain = proxy_domain
+    def __init__(self, target_domain):
         self.target_domain = target_domain
         self.soup = None
 
@@ -75,7 +74,7 @@ class Transformer:
         for el in self.soup.find(tag):
             _(el)
 
-    def _transform_hyperlinks(self):
+    def _transform_hyperlinks(self, request_source):
         """
         Transforms all the hyperlinks on a page (inside <self.soup> object)
         This will keep the user within proxy
@@ -87,21 +86,22 @@ class Transformer:
         for a in self.soup.findAll('a'):
             try:
                 a['href'] = a['href'] \
-                    .replace(self.target_domain, self.proxy_domain) \
+                    .replace(self.target_domain, request_source) \
                     .replace('https', 'http') \
                     .replace('www.', '')
             except KeyError:
                 pass
 
-    def transform(self, page):
+    def transform(self, page, request_source):
         """
         Top-level method for page transformation
         Generates the <self.soup> from given plain html
         :param page:
+        :param request_source: request netloc
         :return:
         """
         self.soup = bs4.BeautifulSoup(page, 'lxml')
-        self._transform_hyperlinks()
+        self._transform_hyperlinks(request_source)
         for tag in ['body', 'title']:  # only parse what we need
             self._transform_tag(tag)
 
@@ -110,6 +110,7 @@ class Transformer:
 
         # fix paths to favicons
         output = output.replace('/images/favicons',
-                                'http://{}/images/favicons'.format(self.target_domain))
+                                'http://{}/images/favicons'.format(
+                                    self.target_domain))
 
         return output

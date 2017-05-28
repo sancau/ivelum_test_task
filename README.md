@@ -10,7 +10,7 @@ cd ivelum_test_task
 docker build -t ivelum_test_task .
 docker run -p 8080:8080 -it --rm ivelum_test_task
 ```
-#### Localy:
+#### Or simply:
 ```bash
 pip install -r requirements.txt
 cd src
